@@ -1,0 +1,17 @@
+{
+  "name": "barbu",
+  "version": "1.0.0",
+  "description": "Login Register Create a game View a game Take an action in a game Get updates to a game live!",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "*",
+    "express-session": "*",
+    "body-parser": "*",
+    "pg-promise": "*"
+  }
+}

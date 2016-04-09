@@ -12,6 +12,7 @@
     "express": "*",
     "express-session": "*",
     "body-parser": "*",
-    "pg-promise": "*"
+    "pg-promise": "*",
+    "bcrypt": "*"
   }
 }

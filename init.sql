@@ -25,8 +25,3 @@ create table if not exists game_players (
 create index on game_players (user_id);
 create index on game_players (game_id);
 create unique index on game_players (user_id, game_id, position);
-
-insert into users (name, password) VALUES ('josh', 'rasputin');
-insert into users (name, password) VALUES ('ella', 'rasputin');
-insert into users (name, password) VALUES ('eric', 'rasputin');
-insert into users (name, password) VALUES ('jenny', 'rasputin');

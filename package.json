@@ -4,15 +4,15 @@
   "description": "Login Register Create a game View a game Take an action in a game Get updates to a game live!",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha -R spec test/helper.js test/*_test.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "*",
-    "express-session": "*",
-    "body-parser": "*",
-    "pg-promise": "*",
-    "bcrypt": "*"
+    "express": "4.13.4",
+    "express-session": "1.13.0",
+    "body-parser": "1.15.0",
+    "pg": "4.5.3",
+    "bcrypt": "0.8.5"
   }
 }

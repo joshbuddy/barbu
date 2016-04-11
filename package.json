@@ -4,7 +4,7 @@
   "description": "Login Register Create a game View a game Take an action in a game Get updates to a game live!",
   "main": "index.js",
   "scripts": {
-    "test": "mocha -R spec test/helper.js test/*_test.js"
+    "test": "NODE_ENV=test mocha -R spec test/helper.js test/*_test.js"
   },
   "author": "",
   "license": "ISC",
@@ -14,5 +14,10 @@
     "body-parser": "1.15.0",
     "pg": "4.5.3",
     "bcrypt": "0.8.5"
+  },
+  "devDependencies": {
+    "supertest": "1.2.0",
+    "chai": "3.5.0",
+    "mocha": "2.4.5"
   }
 }

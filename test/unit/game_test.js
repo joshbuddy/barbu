@@ -113,7 +113,7 @@ describe('Game server', function() {
       this.agent
         .post('/games')
         .send({users: ['josh', 'jenny', 'moxy', 'eric']})
-        .expect(201, 'created', done);
+        .expect(303, 'See Other. Redirecting to /games/1', done);
     })
 
     it("should disallow creating a game with invalid players", function(done) {

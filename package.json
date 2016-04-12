@@ -4,7 +4,9 @@
   "description": "Login Register Create a game View a game Take an action in a game Get updates to a game live!",
   "main": "index.js",
   "scripts": {
-    "test": "NODE_ENV=test mocha -R spec test/helper.js test/unit/*_test.js"
+    "test": "npm run test-unit && npm run test-integeration",
+    "test-unit": "NODE_ENV=test mocha -R spec test/helper.js test/unit/*_test.js",
+    "test-integeration": "NODE_ENV=test mocha -R spec test/helper.js test/integration/*_test.js"
   },
   "author": "",
   "license": "ISC",
@@ -13,11 +15,14 @@
     "express-session": "1.13.0",
     "body-parser": "1.15.0",
     "pg": "4.5.3",
-    "bcrypt": "0.8.5"
+    "bcrypt": "0.8.5",
+    "eventsource": "0.1.6",
+    "lodash": "*"
   },
   "devDependencies": {
     "supertest": "1.2.0",
     "chai": "3.5.0",
-    "mocha": "2.4.5"
+    "mocha": "2.4.5",
+    "request": "*"
   }
 }

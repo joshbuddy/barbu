@@ -1,6 +1,6 @@
 {
   "pg": {
-    "url": "postgres://josh@localhost/barbu-test"
+    "url": "postgres://localhost/barbu-test"
   },
   "session": {
     "secret": "some secret"

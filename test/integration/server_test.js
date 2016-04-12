@@ -97,11 +97,16 @@ describe('A server', function() {
         ];
 
         var es = new EventSource(`http://localhost:3000${gameLocation}`, {headers: {Cookie: String(jar._jar.store.idx.localhost['/']['connect.sid'])}});
+        var esFinished = false;
 
         es.onmessage = (message) => {
           var evt = JSON.parse(message.data);
           assert.deepEqual(evt, expectedEvents.shift());
-          if (expectedEvents.length === 0) return done();
+          if (expectedEvents.length === 0) {
+            esFinished = true;
+            es.close();
+            return done();
+          }
 
           if (evt.type === 'question') {
             req.put(`http://localhost:3000${gameLocation}`, {body: {guess: getAnswer()}}, (err, response) => {
@@ -118,7 +123,7 @@ describe('A server', function() {
         }
 
         es.onclose = () => {
-          assert(false, "stream closed!");
+          assert(esFinished, "stream unexpectantly closed!");
         }
       });
     })

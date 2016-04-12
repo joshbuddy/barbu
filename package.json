@@ -6,7 +6,7 @@
   "scripts": {
     "test": "npm run test-unit && npm run test-integeration",
     "test-unit": "NODE_ENV=test mocha -R spec test/helper.js test/unit/*_test.js",
-    "test-integeration": "NODE_ENV=test mocha -R spec test/helper.js test/integration/*_test.js"
+    "test-integration": "NODE_ENV=test mocha -R spec test/helper.js test/integration/*_test.js"
   },
   "author": "",
   "license": "ISC",

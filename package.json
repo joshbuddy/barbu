@@ -4,7 +4,7 @@
   "description": "Login Register Create a game View a game Take an action in a game Get updates to a game live!",
   "main": "index.js",
   "scripts": {
-    "test": "NODE_ENV=test mocha -R spec test/helper.js test/*_test.js"
+    "test": "NODE_ENV=test mocha -R spec test/helper.js test/unit/*_test.js"
   },
   "author": "",
   "license": "ISC",

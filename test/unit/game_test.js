@@ -1,5 +1,5 @@
 var request = require('supertest')
-var Server = require('../lib/Server');
+var Server = require('../../lib/Server');
 var assert = require('assert');
 
 var createJosh = function() {

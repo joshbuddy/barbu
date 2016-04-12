@@ -4,7 +4,7 @@
   "description": "Login Register Create a game View a game Take an action in a game Get updates to a game live!",
   "main": "index.js",
   "scripts": {
-    "test": "npm run test-unit && npm run test-integeration",
+    "test": "npm run test-unit && npm run test-integration",
     "test-unit": "NODE_ENV=test mocha -R spec test/helper.js test/unit/*_test.js",
     "test-integration": "NODE_ENV=test mocha -R spec test/helper.js test/integration/*_test.js"
   },

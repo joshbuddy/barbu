@@ -9,8 +9,8 @@ script:
   - npm run test-$TEST_SUITE
 env:
   matrix:
-  - TEST_SUITE=unit
-  - TEST_SUITE=integration
+  - CC=clang CXX=clang++ npm_config_clang=1 TEST_SUITE=unit
+  - CC=clang CXX=clang++ npm_config_clang=1 TEST_SUITE=integration
 cache:
   directories:
     - node_modules

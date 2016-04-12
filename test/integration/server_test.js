@@ -90,12 +90,10 @@ describe('A server', function() {
         assert.equal(response.statusCode, 303);
         var gameLocation = response.headers.location;
 
-
-
         var expectedEvents = [
-          {scores: [0,0,0,0], position: 0},
-          {question: {options:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30], position: 0,type: 'pick'}},
-          {scores: [1,0,0,0], position: 1},
+          {type: 'update', body: {scores: [0,0,0,0], position: 0}},
+          {type: 'question', body: {options:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30], position: 0,type: 'pick'}},
+          {type: 'update', body: {scores: [1,0,0,0], position: 1}}
         ];
 
         var es = new EventSource(`http://localhost:3000${gameLocation}`, {headers: {Cookie: String(jar._jar.store.idx.localhost['/']['connect.sid'])}});
@@ -105,7 +103,7 @@ describe('A server', function() {
           assert.deepEqual(evt, expectedEvents.shift());
           if (expectedEvents.length === 0) return done();
 
-          if (evt.question) {
+          if (evt.type === 'question') {
             req.put(`http://localhost:3000${gameLocation}`, {body: {guess: getAnswer()}}, (err, response) => {
               assert(!err);
               assert.equal(response.statusCode, 202);

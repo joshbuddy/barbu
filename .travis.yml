@@ -16,5 +16,3 @@ cache:
     - node_modules
 services:
   postgresql
-before_script:
-  - psql -c 'create database barbu-test;' -U postgres

@@ -11,7 +11,7 @@ create table games (
   state json NOT NULL,
   created_at date default current_date NOT NULL,
   updated_at date default current_date NOT NULL,
-  finished boolean default TRUE NOT NULL
+  finished boolean default false NOT NULL
 );
 create index on games (finished);
 

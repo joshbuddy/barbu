@@ -15,6 +15,7 @@ cache:
   directories:
     - node_modules
 services:
-  postgresql
+  - postgresql
+  - redis-server
 addons:
   postgresql: "9.4"

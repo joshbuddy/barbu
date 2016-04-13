@@ -85,7 +85,7 @@ describe('A server', function() {
       assert(!err, 'unexpected error '+String(err));
       assert.equal(response.statusCode, 200);
 
-      req.post('http://localhost:3000/games', {body: {users: ['josh', 'moxy', 'eric', 'jenny']}}, (err, response, body) => {
+      req.post('http://localhost:3000/games', {body: {users: ['josh', 'moxy', 'eric', 'jenny'], name: 'pick-a-number'}}, (err, response, body) => {
         assert(!err, 'unexpected error '+String(err));
         assert.equal(response.statusCode, 303);
         var gameLocation = response.headers.location;

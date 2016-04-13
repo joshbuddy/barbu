@@ -112,15 +112,22 @@ describe('Game server', function() {
     it("should allow creating a game", function(done) {
       this.agent
         .post('/games')
-        .send({users: ['josh', 'jenny', 'moxy', 'eric']})
+        .send({users: ['josh', 'jenny', 'moxy', 'eric'], name: 'pick-a-number'})
         .expect(303, 'See Other. Redirecting to /games/1', done);
     })
 
     it("should disallow creating a game with invalid players", function(done) {
       this.agent
         .post('/games')
-        .send({users: ['josh', 'jenny', 'moxy', 'ella']})
+        .send({users: ['josh', 'jenny', 'moxy', 'ella'], name: 'pick-a-number'})
         .expect(400, 'player ella not found', done);
+    })
+
+    it("should disallow creating a game with an invalid name", function(done) {
+      this.agent
+        .post('/games')
+        .send({users: ['josh', 'jenny', 'moxy', 'ella'], name: 'thermonuclear-warfare'})
+        .expect(400, 'game thermonuclear-warfare not found', done);
     })
   });
 });

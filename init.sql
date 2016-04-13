@@ -7,6 +7,7 @@ create unique index on users (name);
 
 create table games (
   id serial primary key,
+  name varchar(100) NOT NULL,
   state json NOT NULL,
   finished boolean default TRUE NOT NULL
 );

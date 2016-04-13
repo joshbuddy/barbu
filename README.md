@@ -4,26 +4,36 @@ The ultimate hope of this is to write a really generic framework for expressing 
 
 A game must support the following methods
 
-
 ```javascript
-class Game extends EventEmitter {
 
-  // must return an object with the property position on it. must be idempotent
-  ask() {
-    return {position: 0, ...otherProperties}
+class PickANumber {
+
+  // returns the initial state known by a game
+  static initialState() {
+    return { number: Math.floor(Math.random() * 30) + 1, position: 0, scores: [0,0,0,0] }
   }
 
-  // returns state to a single player. must be idempotent
-  playerState(position) {
-    return {scores: this.state.scores};
+  // returns the last question asked by the game. idempotent, required key 'position'
+  ask(state) {
+    if (Math.max(...state.scores) === 3) return false;
+    return {position: state.position, type: 'pick', options: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]};
   }
 
-  // answers a question asked by the game
-  answer(response) {
-    // do something with the response, update this.state
+  // returns state known by a player. idempotent
+  playerState(state, position) {
+    return {scores: state.scores, position: state.position};
   }
 
+  // answers a question asked by the game, returns the next state
+  answer(state, response) {
+    if (response.guess === state.number) {
+      state.scores[state.position]++;
+      state.number = Math.floor(Math.random() * 30) + 1;
+    }
+
+    state.position++;
+    state.position %= 4;
+    return state;
+  }
 }
 ```
-
-All games will have a `state` property, which is a json serialized object representing everything the game's entire state.

@@ -50,6 +50,37 @@ var createMoxy = function() {
   })
 }
 
+var badPlayers = function(names, gameLocation, cb) {
+  var badPlayer = (index) => {
+    if (index === names.length) return cb();
+    var name = names[index];
+    var jar = request.jar();
+    var req = request.defaults({jar: jar, json: true});
+
+    req.post('http://localhost:3000/login', {body: {name: name, password: 'password'}}, (err, response, body) => {
+      assert(!err, 'unexpected error '+String(err));
+      assert.equal(response.statusCode, 200);
+
+      var es = new EventSource(`http://localhost:3000${gameLocation}`, {headers: {Cookie: String(jar._jar.store.idx.localhost['/']['connect.sid'])}});
+
+      es.onmessage = (message) => {
+        var evt = JSON.parse(message.data);
+        if (evt.type === 'question') {
+          var wrongAnser = (getAnswer() + 1 % 30) + 1;
+          req.put(`http://localhost:3000${gameLocation}`, {body: {guess: wrongAnser}}, (err, response) => {
+            assert(!err);
+            assert.equal(response.statusCode, 202);
+          });
+        }
+      }
+
+      badPlayer(index + 1);
+    });
+  }
+
+  badPlayer(0);
+}
+
 describe('A server', function() {
 
   beforeEach(function(done) {
@@ -85,7 +116,7 @@ describe('A server', function() {
       assert(!err, 'unexpected error '+String(err));
       assert.equal(response.statusCode, 200);
 
-      req.post('http://localhost:3000/games', {body: {users: ['josh', 'moxy', 'eric', 'jenny']}}, (err, response, body) => {
+      req.post('http://localhost:3000/games', {body: {users: ['josh', 'moxy', 'eric', 'jenny'], name: 'pick-a-number'}}, (err, response, body) => {
         assert(!err, 'unexpected error '+String(err));
         assert.equal(response.statusCode, 303);
         var gameLocation = response.headers.location;
@@ -93,38 +124,50 @@ describe('A server', function() {
         var expectedEvents = [
           {type: 'update', body: {scores: [0,0,0,0], position: 0}},
           {type: 'question', body: {options:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30], position: 0,type: 'pick'}},
-          {type: 'update', body: {scores: [1,0,0,0], position: 1}}
+          {type: 'update', body: {scores: [1,0,0,0], position: 1}},
+          {type: 'update', body: {scores: [1,0,0,0], position: 2}},
+          {type: 'update', body: {scores: [1,0,0,0], position: 3}},
+          {type: 'update', body: {scores: [1,0,0,0], position: 0}},
+          {type: 'question', body: {options:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30], position: 0,type: 'pick'}},
+          {type: 'update', body: {scores: [2,0,0,0], position: 1}},
+          {type: 'update', body: {scores: [2,0,0,0], position: 2}},
+          {type: 'update', body: {scores: [2,0,0,0], position: 3}},
+          {type: 'update', body: {scores: [2,0,0,0], position: 0}},
+          {type: 'question', body: {options:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30], position: 0,type: 'pick'}},
+          {type: 'update', body: {scores: [3,0,0,0], position: 0}},
+          {type: 'finished'}
         ];
 
-        var es = new EventSource(`http://localhost:3000${gameLocation}`, {headers: {Cookie: String(jar._jar.store.idx.localhost['/']['connect.sid'])}});
-        var esFinished = false;
+        badPlayers(['eric', 'jenny', 'moxy'], gameLocation, () => {
+          var es = new EventSource(`http://localhost:3000${gameLocation}`, {headers: {Cookie: String(jar._jar.store.idx.localhost['/']['connect.sid'])}});
+          var esFinished = false;
 
-        es.onmessage = (message) => {
-          var evt = JSON.parse(message.data);
-          assert.deepEqual(evt, expectedEvents.shift());
-          if (expectedEvents.length === 0) {
-            esFinished = true;
+          es.onmessage = (message) => {
+            var evt = JSON.parse(message.data);
+            var expectedEvent = expectedEvents.shift();
+            assert.deepEqual(evt, expectedEvent, "didn't match "+message.data);
+            if (expectedEvents.length === 0) {
+              esFinished = true;
+            }
+
+            if (evt.type === 'question') {
+              req.put(`http://localhost:3000${gameLocation}`, {body: {guess: getAnswer()}}, (err, response) => {
+                assert(!err);
+                assert.equal(response.statusCode, 202);
+              });
+            }
+          }
+
+          es.onerror = (err) => {
             es.close();
-            return done();
+            assert(esFinished, "error processing stream "+String(err));
+            done();
           }
 
-          if (evt.type === 'question') {
-            req.put(`http://localhost:3000${gameLocation}`, {body: {guess: getAnswer()}}, (err, response) => {
-              assert(!err);
-              assert.equal(response.statusCode, 202);
-            });
+          es.onclose = () => {
+            assert(false, "stream unexpectantly closed!");
           }
-        }
-
-        es.onerror = (err) => {
-          console.error('err', err)
-          es.close();
-          assert(false, "error processing stream "+String(err));
-        }
-
-        es.onclose = () => {
-          assert(esFinished, "stream unexpectantly closed!");
-        }
+        });
       });
     })
   })

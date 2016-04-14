@@ -112,16 +112,54 @@ describe('Game server', function() {
     it("should allow creating a game", function(done) {
       this.agent
         .post('/games')
-        .send({users: ['josh', 'jenny', 'moxy', 'eric']})
-        .expect(303, 'See Other. Redirecting to /games/1', done);
+        .send({users: ['josh', 'jenny', 'moxy', 'eric'], name: 'pick-a-number'})
+        .expect(303, /See Other. Redirecting to \/games\/\d+/, done);
     })
 
     it("should disallow creating a game with invalid players", function(done) {
       this.agent
         .post('/games')
-        .send({users: ['josh', 'jenny', 'moxy', 'ella']})
+        .send({users: ['josh', 'jenny', 'moxy', 'ella'], name: 'pick-a-number'})
         .expect(400, 'player ella not found', done);
     })
+
+    it("should disallow creating a game with an invalid name", function(done) {
+      this.agent
+        .post('/games')
+        .send({users: ['josh', 'jenny', 'moxy', 'ella'], name: 'thermonuclear-warfare'})
+        .expect(400, 'game thermonuclear-warfare not found', done);
+    })
   });
+
+  describe('GET /games', function() {
+    createMoxy();
+    createJenny();
+    createEric();
+
+    beforeEach(function() {
+      this.agent = request.agent(this.app);
+    })
+
+    // logged in as josh
+    createJosh();
+
+    beforeEach(function(done) {
+      this.agent
+        .post('/games')
+        .send({users: ['josh', 'jenny', 'moxy', 'eric'], name: 'pick-a-number'})
+        .expect(303, done);
+    })
+
+    it('should return a list of games', function(done) {
+      this.agent
+        .get('/games')
+        .expect(200, (err, response, body) => {
+          assert(!err, String(err));
+          assert.equal(response.body.games.length, 1);
+          assert.equal(response.body.games[0].name, 'pick-a-number');
+          done();
+        });
+    })
+  })
 });
 

@@ -21,7 +21,7 @@ const config = {
         test: /\.jsx?$/,
         query: {
           plugins: ['transform-runtime'],
-          presets: ['es2015', 'react'],
+          presets: ['es2015', 'stage-0', 'react'],
         }
       },
     ],

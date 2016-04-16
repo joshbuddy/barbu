@@ -57,4 +57,42 @@ function createAccount(name, password) {
   }
 }
 
-export { initialize, loginAccount, createAccount };
+function createGame(names) {
+  return (dispatch) => {
+    dispatch({type: 'createGame', loading: true})
+    axios.post('/games', {names: names}).then((response) => {
+      console.log('repsonse', response);
+      dispatch({type: 'games', list: response.data.games, loading: false});
+    }).catch((response) => {
+      dispatch({type: 'games', loading: false, error: String(response.data)});
+    });
+  }
+}
+
+function listGames() {
+  return (dispatch) => {
+    dispatch({type: 'games', loading: true})
+    axios.get('/games').then((response) => {
+      console.log('repsonse', response);
+      dispatch({type: 'games', list: response.data.games, loading: false});
+    }).catch((response) => {
+      dispatch({type: 'games', loading: false, error: String(response.data)});
+    });
+  }
+}
+
+function addChat(from, message) {
+  return {type: 'chat', message: message, from: from};
+}
+
+function sendChat(message) {
+  return (dispatch) => {
+    axios.post('/chat', {message: message}).then((response) => {
+      console.error('response', response)
+    }).catch((response) => {
+      console.error('response!', response)
+    });
+  }
+}
+
+export { initialize, loginAccount, createAccount, listGames, createGame, addChat, sendChat };

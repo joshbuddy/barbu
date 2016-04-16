@@ -2,10 +2,12 @@ import React, { Component } from 'react';
 import GameList from './GameList';
 import { connect } from 'react-redux';
 import LoginSignup from './LoginSignup';
+import { listGames } from '../actions';
 
 function mapStateToProps(state) { return state; }
 function mapDispatchToProps(dispatch) {
   return {
+    listGames: () => { dispatch(listGames())}
   }
 }
 

@@ -1,5 +1,4 @@
 const NQ = require('../../lib/games/no-queens/Game');
-const Card = require('../../lib/games/no-queens/Card');
 const assert = require('assert');
 
 function assertPlayedCard(state, answer, chosenCard) {

@@ -1,4 +1,9 @@
 const NQ = require('../../lib/games/no-queens/Game');
+const Card = require('../../lib/games/utils/Card');
+const Trick = require('../../lib/games/utils/Trick');
+const Deck = require('../../lib/games/utils/Deck');
+const Deal = require('../../lib/games/utils/Deal');
+const Hand = require('../../lib/games/utils/Hand');
 const assert = require('assert');
 
 function assertPlayedCard(state, answer, chosenCard) {

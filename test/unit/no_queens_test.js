@@ -26,12 +26,13 @@ function assertTrickCleanup(state, answer, trickPosition) {
   var queens = 0;
   for (var i = 0; i < 4; i++) {
     // check for queen
-    if (answer.tricks[trickPosition].playedCards[i] % 13 == 10) {
+    var cardRank = Card.getRank(answer.tricks[trickPosition].playedCards[i]);
+    if (cardRank == 12) {
       queens = queens + 1;
     }
-    if (answer.tricks[trickPosition].playedCards[i] > winnerValue && Math.floor(answer.tricks[trickPosition].playedCards[i] / 13) == state.currentTrick.suit) {
+    if (cardRank > winnerValue && answer.tricks[trickPosition].playedCards[i].charAt(0) == state.currentTrick.suit) {
       winnerPosition = i;
-      winnerValue = answer.tricks[trickPosition].playedCards[i];
+      winnerValue = cardRank;
     }
   }
   if (queens > 0) {
@@ -72,7 +73,7 @@ describe("no queens", function() {
       });
       var cards = [];
       for (var i=0; i<deck.length; i++) {
-        assert.equal(cards.indexOf(deck[i]), -1, "There are two copies of " + Card.short(deck[i]));
+        assert.equal(cards.indexOf(deck[i]), -1, "There are two copies of " + deck[i]);
         cards.push(deck[i]);
       }
     });
@@ -105,42 +106,43 @@ describe("no queens", function() {
       this.game = new NQ();
     });
     it("should return the correct state with new question when leading", function() {
-      var state = { deal: [ [ 12, 9, 7, 25, 19, 16, 36, 32, 28, 51, 44, 42, 39 ], [ 8, 5, 24, 15, 14, 34, 30, 29, 26, 50, 48, 41, 40 ], [ 10, 3, 0, 23, 22, 20, 13, 38, 35, 33, 49, 46, 45 ], [ 11, 6, 4, 2, 1, 21, 18, 17, 37, 31, 27, 47, 43 ] ], tricks: [], scores: [ 0, 0, 0, 0 ], currentTrick: null, question: { position: 0, values: [ 12, 9, 7, 25, 19, 16, 36, 32, 28, 51, 44, 42, 39 ], type: 'lead' } };
+      var state = { deal: [ [ "CA", "CJ", "C9", "DA", "D8", "D5", "HQ", "H8", "H4", "SA", "S7", "S5", "S2" ], [ "CT", "C7", "DK", "D4", "D3", "HT", "H6", "H5", "H2", "SK", "SJ", "S4", "S3" ], [ "CQ", "C5", "C2","DQ", "DJ", "D9", "D2", "HA", "HJ", "H9", "SQ", "S9", "S8" ], [ "CK", "C8", "C6", "C4", "C3", "DT", "D7", "D6", "HK", "H7", "H3", "ST", "S6" ] ], tricks: [], scores: [ 0, 0, 0, 0 ], currentTrick: null, question: { position: 0, values: [ "CA", "CJ", "C9", "DA", "D8", "D5", "HQ", "H8", "H4", "SA", "S7", "S5", "S2" ], type: 'lead' } };
 
-      var correctAnswer = { deal: [ [ 12, 9, 7, 25, 19, 16, 36, 32, 28, 51, 42, 39 ], [ 8, 5, 24, 15, 14, 34, 30, 29, 26, 50, 48, 41, 40 ], [ 10, 3, 0, 23, 22, 20, 13, 38, 35, 33, 49, 46, 45 ], [ 11, 6, 4, 2, 1, 21, 18, 17, 37, 31, 27, 47, 43 ] ], tricks: [], scores: [ 0, 0, 0, 0 ], currentTrick: { suit: 3, playedCards: { '0': 44 }, playedCount: 1 }, question: { position: 1, values: [ 50, 48, 41, 40 ], type: 'follow' } };
+      var correctAnswer = { deal: [ [ "CA", "CJ", "C9", "DA", "D8", "D5", "HQ", "H8", "H4", "SA", "S5", "S2" ], [ "CT", "C7", "DK", "D4", "D3", "HT", "H6", "H5", "H2", "SK", "SJ", "S4", "S3" ], [ "CQ", "C5", "C2","DQ", "DJ", "D9", "D2", "HA", "HJ", "H9", "SQ", "S9", "S8" ], [ "CK", "C8", "C6", "C4", "C3", "DT", "D7", "D6", "HK", "H7", "H3", "ST", "S6" ] ], tricks: [], scores: [ 0, 0, 0, 0 ], currentTrick: { suit: 'S', playedCards: { '0': "S7" }, playedCount: 1 }, question: { position: 1, values: [ "SK", "SJ", "S4", "S3" ], type: 'follow' } };
 
-      var chosenCard = 44;
+      var chosenCard = "S7";
       var answer = this.game.answer(state, chosenCard);
 
       assert.deepStrictEqual(answer, correctAnswer);
       assertPlayedCard(state, answer, chosenCard);
     });
     it("should also return the correct state when second player plays to the trick", function() {
-      var state = { deal: [ [ 12, 9, 7, 25, 19, 16, 36, 32, 28, 51, 42, 39 ], [ 8, 5, 24, 15, 14, 34, 30, 29, 26, 50, 48, 41, 40 ], [ 10, 3, 0, 23, 22, 20, 13, 38, 35, 33, 49, 46, 45 ], [ 11, 6, 4, 2, 1, 21, 18, 17, 37, 31, 27, 47, 43 ] ], tricks: [], scores: [ 0, 0, 0, 0 ], currentTrick: { suit: 3, playedCards: { '0': 44 }, playedCount: 1 }, question: { position: 1, values: [ 50, 48, 41, 40 ], type: 'follow' } };
+      var state = { deal: [ [ "CA", "CJ", "C9", "DA", "D8", "D5", "HQ", "H8", "H4", "SA", "S5", "S2" ], [ "CT", "C7", "DK", "D4", "D3", "HT", "H6", "H5", "H2", "SK", "SJ", "S4", "S3" ], [ "CQ", "C5", "C2","DQ", "DJ", "D9", "D2", "HA", "HJ", "H9", "SQ", "S9", "S8" ], [ "CK", "C8", "C6", "C4", "C3", "DT", "D7", "D6", "HK", "H7", "H3", "ST", "S6" ] ], tricks: [], scores: [ 0, 0, 0, 0 ], currentTrick: { suit: 'S', playedCards: { '0': "S7" }, playedCount: 1 }, question: { position: 1, values: [ "SK", "SJ", "S4", "S3" ], type: 'follow' } };
 
-      var correctAnswer = { deal: [ [ 12, 9, 7, 25, 19, 16, 36, 32, 28, 51, 42, 39 ], [ 8, 5, 24, 15, 14, 34, 30, 29, 26, 50, 41, 40 ], [ 10, 3, 0, 23, 22, 20, 13, 38, 35, 33, 49, 46, 45 ], [ 11, 6, 4, 2, 1, 21, 18, 17, 37, 31, 27, 47, 43 ] ], tricks: [], scores: [ 0, 0, 0, 0 ], currentTrick: { suit: 3, playedCards: { '0': 44, '1': 48 }, playedCount: 2 }, question: { position: 2, values: [ 49, 46, 45 ], type: 'follow' } };
+      var correctAnswer = { deal: [ [ "CA", "CJ", "C9", "DA", "D8", "D5", "HQ", "H8", "H4", "SA", "S5", "S2" ], [ "CT", "C7", "DK", "D4", "D3", "HT", "H6", "H5", "H2", "SK", "S4", "S3" ], [ "CQ", "C5", "C2","DQ", "DJ", "D9", "D2", "HA", "HJ", "H9", "SQ", "S9", "S8" ], [ "CK", "C8", "C6", "C4", "C3", "DT", "D7", "D6", "HK", "H7", "H3", "ST", "S6" ] ], tricks: [], scores: [ 0, 0, 0, 0 ], currentTrick: { suit: 'S', playedCards: { '0': "S7", '1': "SJ" }, playedCount: 2 }, question: { position: 2, values: [ "SQ", "S9", "S8" ], type: 'follow' } };
 
-      var chosenCard = 48;
+      var chosenCard = "SJ";
       var answer = this.game.answer(state, chosenCard);
 
       assert.deepStrictEqual(answer, correctAnswer);
       assertPlayedCard(state, answer, chosenCard);
     });
     it("should also return the correct state when third player plays to the trick", function() {
-      var state = { deal: [ [ 12, 9, 7, 25, 19, 16, 36, 32, 28, 51, 42, 39 ], [ 8, 5, 24, 15, 14, 34, 30, 29, 26, 50, 41, 40 ], [ 10, 3, 0, 23, 22, 20, 13, 38, 35, 33, 49, 46, 45 ], [ 11, 6, 4, 2, 1, 21, 18, 17, 37, 31, 27, 47, 43 ] ], tricks: [], scores: [ 0, 0, 0, 0 ], currentTrick: { suit: 3, playedCards: { '0': 44, '1': 48 }, playedCount: 2 }, question: { position: 2, values: [ 49, 46, 45 ], type: 'follow' } };
-      var correctAnswer = { deal: [ [ 12, 9, 7, 25, 19, 16, 36, 32, 28, 51, 42, 39 ], [ 8, 5, 24, 15, 14, 34, 30, 29, 26, 50, 41, 40 ], [ 10, 3, 0, 23, 22, 20, 13, 38, 35, 33, 49, 45 ], [ 11, 6, 4, 2, 1, 21, 18, 17, 37, 31, 27, 47, 43 ] ], tricks: [], scores: [ 0, 0, 0, 0 ], currentTrick: { suit: 3, playedCards: { '0': 44, '1': 48, '2': 46 }, playedCount: 3 }, question: { position: 3, values: [ 47, 43 ], type: 'follow' } };
+      var state = { deal: [ [ "CA", "CJ", "C9", "DA", "D8", "D5", "HQ", "H8", "H4", "SA", "S5", "S2" ], [ "CT", "C7", "DK", "D4", "D3", "HT", "H6", "H5", "H2", "SK", "S4", "S3" ], [ "CQ", "C5", "C2","DQ", "DJ", "D9", "D2", "HA", "HJ", "H9", "SQ", "S9", "S8" ], [ "CK", "C8", "C6", "C4", "C3", "DT", "D7", "D6", "HK", "H7", "H3", "ST", "S6" ] ], tricks: [], scores: [ 0, 0, 0, 0 ], currentTrick: { suit: 'S', playedCards: { '0': "S7", '1': "SJ" }, playedCount: 2 }, question: { position: 2, values: [ "SQ", "S9", "S8" ], type: 'follow' } };
+      var correctAnswer = { deal: [ [ "CA", "CJ", "C9", "DA", "D8", "D5", "HQ", "H8", "H4", "SA", "S5", "S2" ], [ "CT", "C7", "DK", "D4", "D3", "HT", "H6", "H5", "H2", "SK", "S4", "S3" ], [ "CQ", "C5", "C2","DQ", "DJ", "D9", "D2", "HA", "HJ", "H9", "SQ", "S8" ], [ "CK", "C8", "C6", "C4", "C3", "DT", "D7", "D6", "HK", "H7", "H3", "ST", "S6" ] ], tricks: [], scores: [ 0, 0, 0, 0 ], currentTrick: { suit: 'S', playedCards: { '0': "S7", '1': "SJ", '2': "S9" }, playedCount: 3 }, question: { position: 3, values: [ "ST", "S6" ], type: 'follow' } };
 
-      var chosenCard = 46;
+      var chosenCard = "S9";
       var answer = this.game.answer(state, chosenCard);
 
       assert.deepStrictEqual(answer, correctAnswer);
       assertPlayedCard(state, answer, chosenCard);
     });
     it("should return correct state with new question for trick winner when last card of trick is played", function() {
-      var state = { deal: [ [ 12, 9, 7, 25, 19, 16, 36, 32, 28, 51, 42, 39 ], [ 8, 5, 24, 15, 14, 34, 30, 29, 26, 50, 41, 40 ], [ 10, 3, 0, 23, 22, 20, 13, 38, 35, 33, 49, 45 ], [ 11, 6, 4, 2, 1, 21, 18, 17, 37, 31, 27, 47, 43 ] ], tricks: [], scores: [ 0, 0, 0, 0 ], currentTrick: { suit: 3, playedCards: { '0': 44, '1': 48, '2': 46 }, playedCount: 3 }, question: { position: 3, values: [ 47, 43 ], type: 'follow' } };
+      var state = { deal: [ [ "CA", "CJ", "C9", "DA", "D8", "D5", "HQ", "H8", "H4", "SA", "S5", "S2" ], [ "CT", "C7", "DK", "D4", "D3", "HT", "H6", "H5", "H2", "SK", "S4", "S3" ], [ "CQ", "C5", "C2","DQ", "DJ", "D9", "D2", "HA", "HJ", "H9", "SQ", "S8" ], [ "CK", "C8", "C6", "C4", "C3", "DT", "D7", "D6", "HK", "H7", "H3", "ST", "S6" ] ], tricks: [], scores: [ 0, 0, 0, 0 ], currentTrick: { suit: 'S', playedCards: { '0': "S7", '1': "SJ", '2': "S9" }, playedCount: 3 }, question: { position: 3, values: [ "ST", "S6" ], type: 'follow' } };
       var correctAnswer = { deal: [ [ 12, 9, 7, 25, 19, 16, 36, 32, 28, 51, 42, 39 ], [ 8, 5, 24, 15, 14, 34, 30, 29, 26, 50, 41, 40 ], [ 10, 3, 0, 23, 22, 20, 13, 38, 35, 33, 49, 45 ], [ 11, 6, 4, 2, 1, 21, 18, 17, 37, 31, 27, 43 ] ], tricks: [ { suit: 3, playedCards: { '0': 44, '1': 48, '2': 46, '3': 47 }, leadPosition: 0 } ], scores: [ 0, 0, 0, 0 ], currentTrick: null, question: { position: 1, values: [ 8, 5, 24, 15, 14, 34, 30, 29, 26, 50, 41, 40 ], type: 'lead' } };
+      var correctAnswer = { deal: [ [ "CA", "CJ", "C9", "DA", "D8", "D5", "HQ", "H8", "H4", "SA", "S5", "S2" ], [ "CT", "C7", "DK", "D4", "D3", "HT", "H6", "H5", "H2", "SK", "S4", "S3" ], [ "CQ", "C5", "C2","DQ", "DJ", "D9", "D2", "HA", "HJ", "H9", "SQ", "S8" ], [ "CK", "C8", "C6", "C4", "C3", "DT", "D7", "D6", "HK", "H7", "H3", "S6" ] ], tricks: [ { suit: 'S', playedCards: { '0': "S7", '1': "SJ", '2': "S9", '3': "ST" }, leadPosition: 0 } ], scores: [ 0, 0, 0, 0 ], currentTrick: null, question: { position: 1, values: [ "CT", "C7", "DK", "D4", "D3", "HT", "H6", "H5", "H2", "SK", "S4", "S3" ], type: 'lead' } };
 
-      var chosenCard = 47;
+      var chosenCard = "ST";
       var answer = this.game.answer(state, chosenCard);
 
       assert.deepStrictEqual(answer, correctAnswer);
@@ -148,10 +150,10 @@ describe("no queens", function() {
       assertTrickCleanup(state, answer, 0);
     });
     it("should update score when queen is played", function() {
-      var state = { deal: [ [ 6, 4, 3, 0, 21, 20, 15, 33, 31, 30, 50, 40 ], [ 11, 9, 7, 1, 19, 16, 38, 37, 28, 27, 51, 45 ], [ 8, 2, 23, 22, 13, 36, 35, 34, 26, 48, 47, 41 ], [ 12, 10, 5, 25, 24, 18, 17, 14, 32, 29, 49, 46, 44 ] ], tricks: [], scores: [ 0, 0, 0, 0 ], currentTrick: { suit: 3, playedCards: { '0': 39, '1': 43, '2': 42 }, playedCount: 3 }, question: { position: 3, values: [ 49, 46, 44 ], type: 'follow' } };
-      var correctAnswer = { deal: [ [ 6, 4, 3, 0, 21, 20, 15, 33, 31, 30, 50, 40 ], [ 11, 9, 7, 1, 19, 16, 38, 37, 28, 27, 51, 45 ], [ 8, 2, 23, 22, 13, 36, 35, 34, 26, 48, 47, 41 ], [ 12, 10, 5, 25, 24, 18, 17, 14, 32, 29, 46, 44 ] ], tricks: [ { suit: 3, playedCards: { '0': 39, '1': 43, '2': 42, '3': 49 }, leadPosition: 0 } ], scores: [ 0, 0, 0, -8 ], currentTrick: null, question: { position: 3, values: [ 12, 10, 5, 25, 24, 18, 17, 14, 32, 29, 46, 44 ], type: 'lead' } };
+      var state = { deal: [ [ "C8", "C6", "C5", "C2", "DT", "D9", "D4", "H9", "H7", "H6", "SK", "S3" ], [ "CK", "CJ", "C9", "C3", "D8", "D5", "HA", "HK", "H4", "H3", "SA", "S8" ], [ "CT", "C4", "DQ", "DJ", "D2", "HQ", "HJ", "HT", "H2", "SJ", "ST", "S4" ], [ "CA", "CQ", "C7", "DA", "DK", "D7", "D6", "D3", "H8", "H5", "SQ", "S9", "S7" ] ], tricks: [], scores: [ 0, 0, 0, 0 ], currentTrick: { suit: 'S', playedCards: { '0': "S2", '1': "S6", '2': "S5" }, playedCount: 3 }, question: { position: 3, values: [ "SQ", "S9", "S7" ], type: 'follow' } };
+      var correctAnswer = { deal: [ [ "C8", "C6", "C5", "C2", "DT", "D9", "D4", "H9", "H7", "H6", "SK", "S3" ], [ "CK", "CJ", "C9", "C3", "D8", "D5", "HA", "HK", "H4", "H3", "SA", "S8" ], [ "CT", "C4", "DQ", "DJ", "D2", "HQ", "HJ", "HT", "H2", "SJ", "ST", "S4" ], [ "CA", "CQ", "C7", "DA", "DK", "D7", "D6", "D3", "H8", "H5", "S9", "S7" ] ], tricks: [ { suit: 'S', playedCards: { '0': "S2", '1': "S6", '2': "S5", '3': "SQ" }, leadPosition: 0 } ], scores: [ 0, 0, 0, -8 ], currentTrick: null, question: { position: 3, values: [ "CA", "CQ", "C7", "DA", "DK", "D7", "D6", "D3", "H8", "H5", "S9", "S7" ], type: 'lead' } };
 
-      var chosenCard = 49;
+      var chosenCard = "SQ";
       var answer = this.game.answer(state, chosenCard);
 
       assert.deepStrictEqual(answer, correctAnswer);
@@ -159,9 +161,9 @@ describe("no queens", function() {
       assertTrickCleanup(state, answer, 0);
     });
     it("should correctly detect end of game when all 4 queens have bene played", function() {
-      var state = { deal: [ [ 8, 34, 32, 30 ], [ 7, 3, 19, 13 ], [ 25, 17, 49, 45, 40 ], [ 9, 0, 20, 18 ] ], tricks: [ { suit: 0, playedCards: { '0': 12, '1': 2, '2': 1, '3': 10 }, leadPosition: 0 }, { suit: 2, playedCards: { '0': 33, '1': 29, '2': 37, '3': 28 }, leadPosition: 0 }, { suit: 2, playedCards: { '0': 26, '1': 38, '2': 35, '3': 36 }, leadPosition: 2 }, { suit: 3, playedCards: { '0': 47, '1': 50, '2': 46, '3': 43 }, leadPosition: 1 }, { suit: 3, playedCards: { '0': 44, '1': 41, '2': 42, '3': 51 }, leadPosition: 1 }, { suit: 1, playedCards:  { '0': 21, '1': 14, '2': 15, '3': 22 }, leadPosition: 3 }, { suit: 0, playedCards: { '0': 5, '1': 4, '2': 6, '3': 11 }, leadPosition: 3 }, { suit: 1, playedCards: { '0': 27, '1': 16, '2': 23, '3': 24 }, leadPosition: 3 } ], scores: [ -8, -8, 0, -8 ], currentTrick: { suit: 3, playedCards: { '0': 31, '1': 39, '3': 48 }, playedCount: 3 }, question: { position: 2, values: [ 49, 45, 40 ], type: 'follow' } };
-      var correctAnswer = { deal: [ [ 8, 34, 32, 30 ], [ 7, 3, 19, 13 ], [ 25, 17, 45, 40 ], [ 9, 0, 20, 18 ] ], tricks: [ { suit: 0, playedCards: { '0': 12, '1': 2, '2': 1, '3': 10 }, leadPosition: 0 }, { suit: 2, playedCards: { '0': 33, '1': 29, '2': 37, '3': 28 }, leadPosition: 0 }, { suit: 2, playedCards: { '0': 26, '1': 38, '2': 35, '3': 36 }, leadPosition: 2 }, { suit: 3, playedCards: { '0': 47, '1': 50, '2': 46, '3': 43 }, leadPosition: 1 }, { suit: 3, playedCards: { '0': 44, '1': 41, '2': 42, '3': 51 }, leadPosition: 1 }, { suit: 1, playedCards:  { '0': 21, '1': 14, '2': 15, '3': 22 }, leadPosition: 3 }, { suit: 0, playedCards: { '0': 5, '1': 4, '2': 6, '3': 11 }, leadPosition: 3 }, { suit: 1, playedCards: { '0': 27, '1': 16, '2': 23, '3': 24 }, leadPosition: 3 }, { suit: 3, playedCards: { '0': 31, '1': 39, '2': 49, '3': 48 }, leadPosition: 3 } ], scores: [ -8, -8, -8, -8 ], currentTrick: null, question: null };
-      var chosenCard = 49;
+      var state = { deal: [ [ "CT", "HT", "H8", "H6" ], [ "C9", "C5", "D8", "D2" ], [ "DA", "D6", "SQ", "S8", "S3" ], [ "CJ", "C2", "D9", "D7" ] ], tricks: [ { suit: 'C', playedCards: { '0': "CA", '1': "C4", '2': "C3", '3': "CQ" }, leadPosition: 0 }, { suit: 'H', playedCards: { '0': "H9", '1': "H5", '2': "HK", '3': "H4" }, leadPosition: 0 }, { suit: 'H', playedCards: { '0': "H2", '1': "HA", '2': "HJ", '3': "HQ" }, leadPosition: 2 }, { suit: 'S', playedCards: { '0': "ST", '1': "SK", '2': "S9", '3': "S6" }, leadPosition: 1 }, { suit: 'S', playedCards: { '0': "S7", '1': "S4", '2': "S5", '3': "SA" }, leadPosition: 1 }, { suit: 'D', playedCards:  { '0': "DT", '1': "D3", '2': "D4", '3': "DJ" }, leadPosition: 3 }, { suit: 'C', playedCards: { '0': "C7", '1': "C6", '2': "C8", '3': "CK" }, leadPosition: 3 }, { suit: 'D', playedCards: { '0': "H3", '1': "D5", '2': "DQ", '3': "DK" }, leadPosition: 3 } ], scores: [ -8, -8, 0, -8 ], currentTrick: { suit: 'S', playedCards: { '0': "H7", '1': "S2", '3': "SJ" }, playedCount: 3 }, question: { position: 2, values: [ "SQ", "S8", "S3" ], type: 'follow' } };
+      var correctAnswer = { deal: [ [ "CT", "HT", "H8", "H6" ], [ "C9", "C5", "D8", "D2" ], [ "DA", "D6", "S8", "S3" ], [ "CJ", "C2", "D9", "D7" ] ], tricks: [ { suit: 'C', playedCards: { '0': "CA", '1': "C4", '2': "C3", '3': "CQ" }, leadPosition: 0 }, { suit: 'H', playedCards: { '0': "H9", '1': "H5", '2': "HK", '3': "H4" }, leadPosition: 0 }, { suit: 'H', playedCards: { '0': "H2", '1': "HA", '2': "HJ", '3': "HQ" }, leadPosition: 2 }, { suit: 'S', playedCards: { '0': "ST", '1': "SK", '2': "S9", '3': "S6" }, leadPosition: 1 }, { suit: 'S', playedCards: { '0': "S7", '1': "S4", '2': "S5", '3': "SA" }, leadPosition: 1 }, { suit: 'D', playedCards:  { '0': "DT", '1': "D3", '2': "D4", '3': "DJ" }, leadPosition: 3 }, { suit: 'C', playedCards: { '0': "C7", '1': "C6", '2': "C8", '3': "CK" }, leadPosition: 3 }, { suit: 'D', playedCards: { '0': "H3", '1': "D5", '2': "DQ", '3': "DK" }, leadPosition: 3 }, { suit: 'S', playedCards: { '0': "H7", '1': "S2", '2': "SQ", '3': "SJ" }, leadPosition: 3 } ], scores: [ -8, -8, -8, -8 ], currentTrick: null, question: null };
+      var chosenCard = "SQ";
       var answer = this.game.answer(state, chosenCard);
 
       assert.deepStrictEqual(answer, correctAnswer);
@@ -170,10 +172,10 @@ describe("no queens", function() {
 
     });
     it("should pick the trick winner to be the highest card within the suit rather than highest card", function() {
-      var state = { deal: [ [ 11, 10, 19, 16, 13, 42 ], [ 24, 14, 29, 48, 46, 45 ], [ 1, 23, 21, 15, 35, 28, 27 ], [ 9, 0, 20, 36, 32, 31 ] ], tricks: [ { suit: 3, playedCards: { '0': 50, '1': 44, '2': 51, '3': 49 }, leadPosition: 0 }, { suit: 2, playedCards:  { '0': 38, '1': 26, '2': 37, '3': 30 }, leadPosition: 2 }, { suit: 0, playedCards: { '0': 2, '1': 5, '2': 3, '3': 12 }, leadPosition: 0 }, { suit: 0, playedCards: { '0': 6, '1': 8, '2': 7, '3': 4 }, leadPosition: 3 }, { suit: 3, playedCards: { '0': 40, '1': 43, '2': 39, '3': 47 }, leadPosition: 1 }, { suit: 1, playedCards: { '0': 17, '1': 18, '2': 22, '3': 25 }, leadPosition: 3 } ], scores: [ 0, 0, -8, 0 ], currentTrick: { suit: 2, playedCards: { '0': 41, '1': 34, '3': 33 }, playedCount: 3 }, question: { position: 2, values: [ 35, 28, 27 ], type: 'follow' } };
-      var correctAnswer = { deal: [ [ 11, 10, 19, 16, 13, 42 ], [ 24, 14, 29, 48, 46, 45 ], [ 1, 23, 21, 15, 28, 27 ], [ 9, 0, 20, 36, 32, 31 ] ], tricks: [ { suit: 3, playedCards: { '0': 50, '1': 44, '2': 51, '3': 49 }, leadPosition: 0 }, { suit: 2, playedCards:  { '0': 38, '1': 26, '2': 37, '3': 30 }, leadPosition: 2 }, { suit: 0, playedCards: { '0': 2, '1': 5, '2': 3, '3': 12 }, leadPosition: 0 }, { suit: 0, playedCards: { '0': 6, '1': 8, '2': 7, '3': 4 }, leadPosition: 3 }, { suit: 3, playedCards: { '0': 40, '1': 43, '2': 39, '3': 47 }, leadPosition: 1 }, { suit: 1, playedCards: { '0': 17, '1': 18, '2': 22, '3': 25 }, leadPosition: 3 }, { suit: 2, playedCards: { '0': 41, '1': 34, '2': 35, '3': 33 }, leadPosition: 3 } ], scores: [ 0, 0, -8, 0 ], currentTrick: null, question: { position: 2, values: [ 1, 23, 21, 15, 28, 27 ], type: 'lead' } };
+      var state = { deal: [ [ "CK", "CQ", "D8", "D5", "D2", "S5" ], [ "DK", "D3", "H5", "SJ", "S9", "S8" ], [ "C3", "DQ", "DT", "D4", "HJ", "H4", "H3" ], [ "CJ", "C2", "D9", "HQ", "H8", "H7" ] ], tricks: [ { suit: 'S', playedCards: { '0': "SK", '1': "S7", '2': "SA", '3': "SQ" }, leadPosition: 0 }, { suit: 'H', playedCards:  { '0': "HA", '1': "H2", '2': "HK", '3': "H6" }, leadPosition: 2 }, { suit: 'C', playedCards: { '0': "C4", '1': "C7", '2': "C5", '3': "CA" }, leadPosition: 0 }, { suit: 'C', playedCards: { '0': "C8", '1': "CT", '2': "C9", '3': "C6" }, leadPosition: 3 }, { suit: 'S', playedCards: { '0': "S3", '1': "S6", '2': "S2", '3': "ST" }, leadPosition: 1 }, { suit: 'D', playedCards: { '0': "D6", '1': "D7", '2': "DJ", '3': "DA" }, leadPosition: 3 } ], scores: [ 0, 0, -8, 0 ], currentTrick: { suit: 'H', playedCards: { '0': "S4", '1': "HT", '3': "H9" }, playedCount: 3 }, question: { position: 2, values: [ "HJ", "H4", "H3" ], type: 'follow' } };
+      var correctAnswer = { deal: [ [ "CK", "CQ", "D8", "D5", "D2", "S5" ], [ "DK", "D3", "H5", "SJ", "S9", "S8" ], [ "C3", "DQ", "DT", "D4", "H4", "H3" ], [ "CJ", "C2", "D9", "HQ", "H8", "H7" ] ], tricks: [ { suit: 'S', playedCards: { '0': "SK", '1': "S7", '2': "SA", '3': "SQ" }, leadPosition: 0 }, { suit: 'H', playedCards:  { '0': "HA", '1': "H2", '2': "HK", '3': "H6" }, leadPosition: 2 }, { suit: 'C', playedCards: { '0': "C4", '1': "C7", '2': "C5", '3': "CA" }, leadPosition: 0 }, { suit: 'C', playedCards: { '0': "C8", '1': "CT", '2': "C9", '3': "C6" }, leadPosition: 3 }, { suit: 'S', playedCards: { '0': "S3", '1': "S6", '2': "S2", '3': "ST" }, leadPosition: 1 }, { suit: 'D', playedCards: { '0': "D6", '1': "D7", '2': "DJ", '3': "DA" }, leadPosition: 3 }, { suit: 'H', playedCards: { '0': "S4", '1': "HT", '2': "HJ", '3': "H9" }, leadPosition: 3 } ], scores: [ 0, 0, -8, 0 ], currentTrick: null, question: { position: 2, values: [ "C3", "DQ", "DT", "D4", "H4", "H3"  ], type: 'lead' } };
 
-      var chosenCard = 35;
+      var chosenCard = "HJ";
       var answer = this.game.answer(state, chosenCard);
 
       assert.deepStrictEqual(answer, correctAnswer);
@@ -181,10 +183,10 @@ describe("no queens", function() {
       assertTrickCleanup(state, answer, 6);
     });
     it("should offer all other cards when out of suit we're trying to follow", function() {
-      var state = { deal: [ [ 12, 9, 7, 6, 3, 20, 49 ], [ 11, 23, 32, 30, 51, 48, 47 ], [ 1, 22, 17, 14, 28, 26, 50 ], [ 4, 2, 25, 21, 16, 13, 38 ] ], tricks: [ { suit: 3, playedCards: { '0': 43, '1': 46, '2': 41, '3': 44 }, leadPosition: 0 }, { suit: 0, playedCards: { '0': 5, '1': 0, '2': 10, '3': 8 }, leadPosition: 1 }, { suit: 3, playedCards: { '0': 40, '1': 42, '2': 45, '3': 39 }, leadPosition: 2 }, { suit: 2, playedCards: { '0': 34, '1': 36, '2': 31, '3': 27 }, leadPosition: 2 }, { suit: 1, playedCards: { '0': 19, '1': 18, '2': 15, '3': 24 }, leadPosition: 1 }, { suit: 2, playedCards: { '0': 35, '1': 29, '2': 37, '3': 33 }, leadPosition: 3 } ], scores: [ 0, -8, -8, 0 ], currentTrick: null, question: { position: 2, values: [ 1, 22, 17, 14, 28, 26, 50 ], type: 'lead' } };
-      var correctAnswer = { deal: [ [ 12, 9, 7, 6, 3, 20, 49 ], [ 11, 23, 32, 30, 51, 48, 47 ], [ 1, 22, 17, 14, 28, 26 ], [ 4, 2, 25, 21, 16, 13, 38 ] ], tricks: [ { suit: 3, playedCards: { '0': 43, '1': 46, '2': 41, '3': 44 }, leadPosition: 0 }, { suit: 0, playedCards: { '0': 5, '1': 0, '2': 10, '3': 8 }, leadPosition: 1 }, { suit: 3, playedCards: { '0': 40, '1': 42, '2': 45, '3': 39 }, leadPosition: 2 }, { suit: 2, playedCards: { '0': 34, '1': 36, '2': 31, '3': 27 }, leadPosition: 2 }, { suit: 1, playedCards: { '0': 19, '1': 18, '2': 15, '3': 24 }, leadPosition: 1 }, { suit: 2, playedCards: { '0': 35, '1': 29, '2': 37, '3': 33 }, leadPosition: 3 }, { suit: 2, playedCards: { '0': 35, '1': 29, '2': 37, '3': 33 }, leadPosition: 3 } ], scores: [ 0, -8, -8, 0 ], currentTrick: { suit: 3, playedCards: { '2': 50 }, playedCount: 1 }, question: { position: 3, values: [ 4, 2, 25, 21, 16, 13, 38 ], type: 'follow' } };
+      var state = { deal: [ [ "CA", "CJ", "C9", "C8", "C5", "D9", "SQ" ], [ "CK", "DQ", "H8", "H6", "SA", "SJ", "ST" ], [ "C3", "DJ", "D6", "D3", "H4", "H2", "SK" ], [ "C6", "C4", "DA", "DT", "D5", "D2", "HA" ] ], tricks: [ { suit: 'S', playedCards: { '0': "S6", '1': "S9", '2': "S4", '3': "S7" }, leadPosition: 0 }, { suit: 'C', playedCards: { '0': "C7", '1': "C2", '2': "CQ", '3': "CT" }, leadPosition: 1 }, { suit: 'S', playedCards: { '0': "S3", '1': "S5", '2': "S8", '3': "S2" }, leadPosition: 2 }, { suit: 'H', playedCards: { '0': "HT", '1': "HQ", '2': "H7", '3': "H3" }, leadPosition: 2 }, { suit: 'D', playedCards: { '0': "D8", '1': "D7", '2': "D4", '3': "DK" }, leadPosition: 1 }, { suit: 'H', playedCards: { '0': "HJ", '1': "H5", '2': "HK", '3': "H9" }, leadPosition: 3 } ], scores: [ 0, -8, -8, 0 ], currentTrick: null, question: { position: 2, values: [ "C3", "DJ", "D6", "D3", "H4", "H2", "SK" ], type: 'lead' } };
+      var currentAnswer = { deal: [ [ "CA", "CJ", "C9", "C8", "C5", "D9", "SQ" ], [ "CK", "DQ", "H8", "H6", "SA", "SJ", "ST" ], [ "C3", "DJ", "D6", "D3", "H4", "H2" ], [ "C6", "C4", "DA", "DT", "D5", "D2", "HA" ] ], tricks: [ { suit: 'S', playedCards: { '0': "S6", '1': "S9", '2': "S4", '3': "S7" }, leadPosition: 0 }, { suit: 'C', playedCards: { '0': "C7", '1': "C2", '2': "CQ", '3': "CT" }, leadPosition: 1 }, { suit: 'S', playedCards: { '0': "S3", '1': "S5", '2': "S8", '3': "S2" }, leadPosition: 2 }, { suit: 'H', playedCards: { '0': "HT", '1': "HQ", '2': "H7", '3': "H3" }, leadPosition: 2 }, { suit: 'D', playedCards: { '0': "D8", '1': "D7", '2': "D4", '3': "DK" }, leadPosition: 1 }, { suit: 'H', playedCards: { '0': "HJ", '1': "H5", '2': "HK", '3': "H9" }, leadPosition: 3 } ], scores: [ 0, -8, -8, 0 ], currentTrick: { suit: 'S', playedCards: { '2': "SK" }, playedCount: 1 }, question: { position: 3, values: [ "C6", "C4", "DA", "DT", "D5", "D2", "HA" ], type: 'follow' } };
 
-      var chosenCard = 50; 
+      var chosenCard = "SK"; 
       var answer = this.game.answer(state, chosenCard);
       assert.notEqual(answer.question.values.length, 0);
     });

@@ -10,7 +10,6 @@ function mapDispatchToProps(dispatch) {
     createGame: (names) => {
       dispatch(createGame(names))
     }
-
   }
 }
 
@@ -49,8 +48,13 @@ class GameList extends Component {
     }
   }
 
-  submitCreateGame() {
-
+  submitCreateGame(e) {
+    e.preventDefault();
+    const south = this.refs.south.value;
+    const west = this.refs.west.value;
+    const north = this.refs.north.value;
+    const east = this.refs.east.value;
+    this.props.createGame([south, west, north, east]);
   }
 }
 

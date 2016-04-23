@@ -60,7 +60,7 @@ function createAccount(name, password) {
 function createGame(names) {
   return (dispatch) => {
     dispatch({type: 'createGame', loading: true})
-    axios.post('/games', {names: names}).then((response) => {
+    axios.post('/games', {users: names, name: 'pick-a-number'}).then((response) => {
       console.log('repsonse', response);
       dispatch({type: 'games', list: response.data.games, loading: false});
     }).catch((response) => {

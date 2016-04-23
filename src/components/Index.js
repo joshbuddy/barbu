@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import GameList from './GameList';
 import { connect } from 'react-redux';
 import LoginSignup from './LoginSignup';
+import Game from './Game';
 import { listGames } from '../actions';
 
 function mapStateToProps(state) { return state; }
@@ -24,6 +25,8 @@ class Index extends React.Component {
   renderBody() {
     if (!this.props.initial.loaded) {
       return <div>loading...</div>;
+    } else if (this.props.showGame) {
+      return <Game id={this.props.showGame.id}/>;
     } else if (this.props.user.loggedIn) {
       return <GameList/>;
     } else {

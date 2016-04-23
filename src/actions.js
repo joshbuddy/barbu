@@ -11,7 +11,6 @@ function initialize() {
         dispatch({type: 'user', loggedIn: false});
         dispatch({type: 'initial', loaded: true});
       }
-
       console.error("uncaught error!", response);
     });
   }
@@ -76,9 +75,14 @@ function listGames() {
       console.log('repsonse', response);
       dispatch({type: 'games', list: response.data.games, loading: false});
     }).catch((response) => {
+      console.error('error', response)
       dispatch({type: 'games', loading: false, error: String(response.data)});
     });
   }
+}
+
+function showGame(id) {
+  return {type: 'showGame', id: id, loading: true};
 }
 
 function addChat(from, message) {
@@ -95,4 +99,13 @@ function sendChat(message) {
   }
 }
 
-export { initialize, loginAccount, createAccount, listGames, createGame, addChat, sendChat };
+function updateGame(id, state) {
+  return {type:'showGame', id: id, state: state}
+}
+
+function sendMove() {
+
+}
+
+export { initialize, loginAccount, createAccount, listGames, createGame,
+  addChat, sendChat, showGame, sendMove, updateGame };

@@ -108,7 +108,7 @@ describe('A server', function() {
   createJenny();
   createMoxy();
 
-  it("should start a server", function(done) {
+  it("should play a complete game", function(done) {
     var jar = request.jar();
     var req = request.defaults({jar: jar, json: true});
 
@@ -172,4 +172,42 @@ describe('A server', function() {
     })
   })
 
+  it("should chat", function(done) {
+    var jar = request.jar();
+    var req = request.defaults({jar: jar, json: true});
+    var esFinished = false;
+
+    req.post('http://localhost:3000/login', {body: {name: 'josh', password: 'password'}}, (err, response, body) => {
+      assert(!err, 'unexpected error '+String(err));
+      assert.equal(response.statusCode, 200);
+
+      var es = new EventSource(`http://localhost:3000/chat`, {headers: {Cookie: String(jar._jar.store.idx.localhost['/']['connect.sid'])}});
+
+      es.onmessage = (message) => {
+        var chatMessage = JSON.parse(message.data);
+        assert(chatMessage.from.id);
+        assert.equal(chatMessage.from.name, 'josh');
+        assert.equal(chatMessage.message, 'hello there!');
+        done();
+      }
+
+      es.onerror = (err) => {
+        es.close();
+        assert(esFinished, "error processing stream "+String(err));
+        done();
+      }
+
+      es.onclose = () => {
+        assert(false, "stream unexpectantly closed!");
+      }
+
+      es.onopen = () => {
+        req.post('http://localhost:3000/chat', {body: {message: 'hello there!'}}, (err, response, body) => {
+          assert(!err)
+          assert.equal(response.statusCode, 202);
+        });
+      }
+
+    });
+  });
 })

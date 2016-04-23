@@ -161,5 +161,26 @@ describe('Game server', function() {
         });
     })
   })
+
+  describe('GET /users/:name', function() {
+    beforeEach(function() {
+      this.agent = request.agent(this.app);
+    })
+
+    // logged in as josh
+    createJosh();
+
+    it('should return a user', function(done) {
+      this.agent
+        .get('/users/josh')
+        .expect(200, {name: 'josh'}, done);
+    });
+
+    it('should return a 404 for a non-existent user', function(done) {
+      this.agent
+        .get('/users/ella')
+        .expect(404, done);
+    });
+  });
 });
 

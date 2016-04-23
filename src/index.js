@@ -6,6 +6,8 @@ import ReactDOM from 'react-dom'
 import createLogger from 'redux-logger';
 import { reducer, initialState } from './reducer';
 import Index from './components/Index';
+import axios from 'axios';
+import { initialize } from './actions';
 
 const logger = createLogger();
 const createStoreWithMiddleware = applyMiddleware(thunk, logger)(createStore);
@@ -16,6 +18,8 @@ function configureStore(reducer) {
 
 const store = configureStore(reducer);
 
+store.dispatch(initialize());
+
 class App extends Component {
   render() {
     return (
@@ -25,6 +29,9 @@ class App extends Component {
     );
   }
 }
+
+
+
 
 ReactDOM.render(
   <App />,
